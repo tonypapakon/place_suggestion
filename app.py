@@ -4,6 +4,7 @@
 #Step 4. Save results on CSV
 #Step 5. Make a web interface
 
+
 import requests
 import os
 from transformers import pipeline
@@ -72,7 +73,12 @@ def process_multi_place(place_ids,api_key):
     """
     for place_id in place_ids:
         print(f"Processing reviews for place: {place_id}")
-        reviews = fetch_reviews(place_id, api_key)
+        try:
+            reviews = fetch_reviews(place_id, api_key)
+        except Exception as e:
+            print(f"Error fetching reviews for place {place_id}:{e}")
+            continue
+        
         if not reviews:
             print("No reviews found.")
             continue
@@ -82,7 +88,7 @@ def process_multi_place(place_ids,api_key):
             print(f"Review: {review['text']}")
             print(f"Rating: {review.get('rating', 'N/A')}")
             print(f"Category: {category}")
-            print("-"*400)
+            print("-"*200)
 
 # Start processing reviews for all specified places            
 process_multi_place(PLACE_IDS, API_KEY)
