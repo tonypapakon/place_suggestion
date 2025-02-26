@@ -11,9 +11,9 @@ from transformers import pipeline
 from tqdm import tqdm
 from dotenv import load_dotenv
 
-load_dotenv()
 
 #Google's API key for places
+load_dotenv()
 API_KEY = os.getenv('G_API_KEY')
 
 
