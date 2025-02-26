@@ -10,6 +10,7 @@ import os
 from transformers import pipeline
 from tqdm import tqdm
 from dotenv import load_dotenv
+from collections import Counter
 
 
 #Google's API key for places.
@@ -82,13 +83,44 @@ def process_multi_place(place_ids,api_key):
         if not reviews:
             print("No reviews found.")
             continue
+        
+        overall_ratings = []
+        category_counts = Counter()
     
+        #Process each review
         for review in tqdm(reviews, desc=f"Processing Reviews for {place_id}", unit="review"):
+            review_text = review['text']
             category = classify_review(review['text'])
-            print(f"Review: {review['text']}")
-            print(f"Rating: {review.get('rating', 'N/A')}")
+            rating = review.get('rating', 'N/A')
+            
+            # Count the category if it’s valid
+            if category in CATEGORIES:
+                category_counts[category] += 1
+                
+            #Store the rating if it's a number
+            if isinstance(rating, (int, float)):
+                overall_ratings.append(rating)
+            
+            # Display review details
+            #print(f"Review: {review_text}")
+            print(f"Rating: {rating}")
             print(f"Category: {category}")
-            print("-"*200)
+            print("_"*200)
+            
+        # Calculate and display overall average rating
+        if overall_ratings:
+            overall_avg = sum(overall_ratings) / len(overall_ratings)
+            print(f"Overall average rating: {overall_avg:.1f}")
+        else:
+            print("No ratings")
+                
+        # Determine and display the most common category
+        if category_counts:
+            best_category, count = category_counts.most_common(1)[0]
+            print(f"Best category: {best_category} with {count} reviews")
+        else:
+            print("No categorized reviews")
+        print("="*200)
 
 # Start processing reviews for all specified places            
 process_multi_place(PLACE_IDS, API_KEY)
