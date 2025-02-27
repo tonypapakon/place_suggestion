@@ -1,0 +1,4 @@
+requests
+transformers
+python-dotenv
+flask

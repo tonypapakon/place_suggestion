@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Results</title>
+</head>
+<body>
+    <h1>Review Analysis</h1>
+    <ul>
+        {% for review in reviews %}
+            <li>
+                <p><strong>Review:</strong> {{ review['text'] }}</p>
+                <p><strong>Category:</strong> {{ review['category'] }}</p>
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="/">Back to Home</a>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Review Analyzer</title>
+</head>
+<body>
+    <h1>Enter Place ID</h1>
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+    <form method="POST" action="/">
+        <label for="place_id">Place ID:</label>
+        <input type="text" id="place_id" name="place_id" required>
+        <button type="submit">Analyze</button>
+    </form>
+</body>
+</html>
