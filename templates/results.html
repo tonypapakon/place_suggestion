@@ -3,17 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <title>Results</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Review Analysis</h1>
-    <ul>
-        {% for review in reviews %}
-            <li>
-                <p><strong>Review:</strong> {{ review['text'] }}</p>
-                <p><strong>Category:</strong> {{ review['category'] }}</p>
-            </li>
-        {% endfor %}
-    </ul>
-    <a href="/">Back to Home</a>
+    <div class="container">
+        <h1>Places Found</h1>
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% else %}
+            {% for place in places %}
+                <div class="place">
+                    <h2>{{ place['name'] }}</h2>
+                    <p>Overall Average Rating: {{ place['overall_avg']|round(1) if place['overall_avg'] else 'N/A' }}</p>
+                    <p>Most Common Category: {{ place['category'] }}</p>
+                    <div id="map-{{ loop.index }}" class="map">
+                        <iframe
+                            width="100%"
+                            height="300"
+                            frameborder="0"
+                            style="border:0"
+                            allowfullscreen=""
+                            aria-hidden="false"
+                            tabindex="0"
+                            src="https://www.google.com/maps/embed/v1/place?key={{ api_key }}&q={{ place['name'] }}&center={{ place['lat'] }},{{ place['lng'] }}&zoom=15"
+                        ></iframe>
+                    </div>
+                    <h3>Reviews:</h3>
+                    <ul>
+                        {% for review in place['reviews'] %}
+                            <li class="review">
+                                <p><strong>Text:</strong> {{ review['text'] }}</p>
+                                <p><strong>Rating:</strong> {{ review['rating'] }}</p>
+                                <p><strong>Category:</strong> {{ review['category'] }}</p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+        {% endif %}
+        <a href="/">Back to Home</a>
+    </div>
 </body>
 </html>
