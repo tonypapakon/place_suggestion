@@ -40,7 +40,7 @@ Before running this application, you need:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/place_suggestion.git
+git clone https://github.com/tonypapakon/place_suggestion.git
 cd place_suggestion
 ```
 
