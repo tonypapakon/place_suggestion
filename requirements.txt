@@ -2,3 +2,5 @@ requests
 transformers
 python-dotenv
 flask
+torch
+tqdm
