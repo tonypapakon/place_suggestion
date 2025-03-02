@@ -19,6 +19,8 @@ app = Flask(__name__)
 #Google's API key for places.
 load_dotenv()
 API_KEY = os.getenv('G_API_KEY')
+if not API_KEY:
+    raise ValueError('No Google API key provided.')
 
 #Categories for classification
 CATEGORIES = ['service quality', 'value for money', 'food quality', 'ambiance']
@@ -26,6 +28,24 @@ CATEGORIES = ['service quality', 'value for money', 'food quality', 'ambiance']
 #Load the classifier
 classifier = pipeline(model="facebook/bart-large-mnli")
 
+def geocode_address(address, api_key):
+    """Geocode an address to latitude and longitude.
+
+    Args:
+        address (_type_): _description_
+        api_key (_type_): _description_
+    """
+    
+    url = f'https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={api_key}'
+    response = requests.get(url)
+    data = response.json()
+    if data['status'] == 'OK':
+        location = data['results'][0]['geometry']['location']
+        return location['lat'], location['lng']
+    elif data['status'] == 'ZERO_RESULTS':
+        raise ValueError('No results found for the specified address.')
+    else:
+        raise ValueError(f'Geocoding failed with status: {data["status"]}')
 
 def fetch_reviews(place_id, api_key, max_reviews=5):
     """Fetches reviews for a given place ID from Google Maps API.
@@ -67,51 +87,87 @@ def classify_review(review_text):
         return result['labels'][0]
     return 'N/A'
 
-@app.route('/', methods = ['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        place_id = request.form['place_id']
+        category = request.form['category']
         try:
-            #Fetch review
-            reviews = fetch_reviews(place_id, API_KEY)
-            if not reviews:
-                return render_template('results.html', error = "No reviews found or invalid ID.")
+            # Determine location
+            if 'lat' in request.form and 'lng' in request.form and request.form['lat'] and request.form['lng']:
+                lat = float(request.form['lat'])
+                lng = float(request.form['lng'])
+            else:
+                location_text = request.form['location_text']
+                if not location_text:
+                    return render_template('results.html', error='No location provided.')
+                lat, lng = geocode_address(location_text, API_KEY)
+                
+            # Perform a nearby search
+            radius = 1500  # 1.5 km
+            url = f'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={lat},{lng}&radius={radius}&type={category}&key={API_KEY}'
+            response = requests.get(url)
+            data = response.json()
+            if data['status'] != 'OK':
+                return render_template('results.html', error='No places found.')
+            places = data['results'][:3]  # Take first 3 places
             
-            #Process reviews
-            overall_ratings = []
-            category_counts = Counter()
-            classify_reviews = []
-            
-            for review in reviews:
-                category = classify_review(review['text'])
-                rating = review.get('rating', 'N/A')
-                if isinstance(rating, (int, float)):
-                    overall_ratings.append(rating)
-                if category in CATEGORIES:
-                    category_counts[category] += 1
-                classify_reviews.append({
-                    'text': review['text'],
-                    'rating': rating,
-                    'category': category
-                })
+            # Process each place
+            place_data = []
+            for place in places:
+                place_id = place['place_id']
+                name = place['name']
+                # Extract latitude and longitude
+                lat = place['geometry']['location']['lat']
+                lng = place['geometry']['location']['lng']
+                reviews = fetch_reviews(place_id, API_KEY)
+                if not reviews:
+                    continue
+                overall_ratings = []
+                category_counts = Counter()
+                classify_reviews = []
+                for review in reviews:
+                    rating = review.get('rating', 'N/A')
+                    if isinstance(rating, (int, float)):
+                        overall_ratings.append(rating)
+                        if rating >= 4:
+                            category = classify_review(review['text'])
+                            if category in CATEGORIES:
+                                category_counts[category] += 1
+                            else:
+                                category = 'N/A'
+                        else:
+                            category = 'N/A'
+                    else:
+                        category = 'N/A'
                     
-            #Cal avg rating
-            overall_avg = sum(overall_ratings) / len(overall_ratings) if overall_ratings else None
-            
-            #Best category
-            most_common_categoy = category_counts.most_common(1)[0][0] if category_counts else 'N/A'
-            
-            #Render results page with data
-            return render_template('results.html',
-                                   overall_avg=overall_avg,
-                                   most_common_categoy=most_common_categoy,
-                                   reviews=reviews)
-            
+                    # Store all reviews for display            
+                    classify_reviews.append({
+                        'text': review['text'],
+                        'rating': rating,
+                        'category': category
+                    })
+                # Calculate average rating
+                overall_avg = sum(overall_ratings) / len(overall_ratings) if overall_ratings else None
+
+                # Best category
+                most_common_category = category_counts.most_common(1)[0][0] if category_counts else 'N/A'
+                # Add place data including lat and lng
+                place_data.append({
+                    'name': name,
+                    'lat': lat,  # New: latitude
+                    'lng': lng,  # New: longitude
+                    'overall_avg': overall_avg,
+                    'category': most_common_category,
+                    'reviews': classify_reviews
+                })
+            return render_template('results.html', places=place_data, api_key=API_KEY)           
+        except ValueError as e:
+            return render_template('results.html', error=str(e))
         except Exception as e:
-            return render_template('results.html', error = f"An error occurred: {str(e)}")
+            return render_template('results.html', error=f"An error occurred: {str(e)}")
         
-    #GET requests
-    return render_template('index.html')
+    # GET requests
+    return render_template('index.html', api_key = API_KEY)
 
 #Run app
 if __name__ == '__main__':

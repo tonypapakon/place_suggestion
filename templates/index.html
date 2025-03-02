@@ -3,16 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <title>Review Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Enter Place ID</h1>
-    {% if error %}
-        <p style="color: red;">{{ error }}</p>
-    {% endif %}
-    <form method="POST" action="/">
-        <label for="place_id">Place ID:</label>
-        <input type="text" id="place_id" name="place_id" required>
-        <button type="submit">Analyze</button>
-    </form>
+    <div class="container">
+        <h1>Find Nearby Places</h1>
+        <form method="POST" action="/">
+            <div class="form-group">
+                <label for="location">Location:</label>
+                <input type="text" id="location" name="location_text" placeholder="Enter address or leave blank for current location">
+            </div>
+            <div class="form-group">
+                <input type="checkbox" id="use_current" name="use_current"> Use current location
+            </div>
+            <div class="form-group">
+                <label for="category">Category:</label>
+                <select id="category" name="category">
+                    <option value="cafe">Cafe</option>
+                    <option value="bar">Bar</option>
+                </select>
+            </div>
+            <input type="hidden" id="lat" name="lat">
+            <input type="hidden" id="lng" name="lng">
+            <button type="submit">Find Places</button>
+        </form>
+    </div>
+
+    <script>
+        const useCurrentCheckbox = document.getElementById('use_current');
+        const locationInput = document.getElementById('location');
+        const latInput = document.getElementById('lat');
+        const lngInput = document.getElementById('lng');
+    
+        useCurrentCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                locationInput.disabled = true;
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        function(position) {
+                            latInput.value = position.coords.latitude;
+                            lngInput.value = position.coords.longitude;
+                        }, 
+                        function(error) {
+                            let errorMessage;
+                            switch (error.code) {
+                                case error.PERMISSION_DENIED:
+                                    errorMessage = "Permission denied. Please allow location access.";
+                                    break;
+                                case error.POSITION_UNAVAILABLE:
+                                    errorMessage = "Location information is unavailable. Try entering a location manually.";
+                                    break;
+                                case error.TIMEOUT:
+                                    errorMessage = "The request to get location timed out.";
+                                    break;
+                                default:
+                                    errorMessage = "An unknown error occurred.";
+                                    break;
+                            }
+                            alert('Error getting location: ' + errorMessage);
+                            useCurrentCheckbox.checked = false;
+                            locationInput.disabled = false;
+                        }
+                    );
+                } else {
+                    alert('Geolocation is not supported by this browser. Please enter a location manually.');
+                    useCurrentCheckbox.checked = false;
+                    locationInput.disabled = false;
+                }
+            } else {
+                locationInput.disabled = false;
+                latInput.value = '';
+                lngInput.value = '';
+            }
+        });
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{api_key}}&callback=initMap" async defer></script>
 </body>
 </html>
