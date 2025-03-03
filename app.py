@@ -32,8 +32,8 @@ def geocode_address(address, api_key):
     """Geocode an address to latitude and longitude.
 
     Args:
-        address (_type_): _description_
-        api_key (_type_): _description_
+        address (str): The address to geocode.
+        api_key (str): Google API key.
     """
     
     url = f'https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={api_key}'

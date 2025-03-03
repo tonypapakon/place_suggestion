@@ -102,3 +102,60 @@ a {
 a:hover {
     text-decoration: underline;
 }
+
+/* Dark Mode Styles */
+[data-theme="dark"] {
+    background-color: #1a1a1a;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .container {
+    background-color: #1a1a1a;
+}
+
+[data-theme="dark"] .place {
+    background-color: #2d2d2d;
+    border-color: #404040;
+}
+
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3 {
+    color: #ffffff;
+}
+
+[data-theme="dark"] input[type="text"],
+[data-theme="dark"] select {
+    background-color: #333333;
+    color: #ffffff;
+    border-color: #404040;
+}
+
+[data-theme="dark"] .review {
+    background-color: #333333;
+    border-left-color: #007AFF;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 10px;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    background-color: #007AFF;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    transition: background-color 0.3s;
+}
+
+.theme-toggle:hover {
+    background-color: #005ECB;
+}

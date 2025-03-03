@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <title>Results</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+    <button class="theme-toggle" onclick="toggleTheme()">
+        <i class="fas fa-moon"></i>
+    </button>
     <div class="container">
         <h1>Places Found</h1>
         {% if error %}
@@ -20,12 +24,12 @@
                         <iframe
                             width="100%"
                             height="300"
-                            frameborder="0"
                             style="border:0"
-                            allowfullscreen=""
-                            aria-hidden="false"
-                            tabindex="0"
-                            src="https://www.google.com/maps/embed/v1/place?key={{ api_key }}&q={{ place['name'] }}&center={{ place['lat'] }},{{ place['lng'] }}&zoom=15"
+                            loading="lazy"
+                            allowfullscreen
+                            referrerpolicy="no-referrer-when-downgrade"
+                            src="https://www.google.com/maps/embed/v1/place?key={{ api_key }}&q={{ place['name']|urlencode }},{{ place['lat'] }},{{ place['lng'] }}&zoom=15"
+                            onerror="this.innerHTML='<p>Map loading failed. Please try again later.</p>'"
                         ></iframe>
                     </div>
                     <h3>Reviews:</h3>
@@ -43,5 +47,31 @@
         {% endif %}
         <a href="/">Back to Home</a>
     </div>
+    <script>
+        // Theme toggle functionality
+        function toggleTheme() {
+            const body = document.body;
+            const icon = document.querySelector('.theme-toggle i');
+            
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
+            document.querySelector('.theme-toggle i').classList.replace('fa-moon', 'fa-sun');
+        }
+    </script>
 </body>
 </html>
