@@ -1,10 +1,3 @@
-#Step 1. Fetch reviews from Google Maps using Places API
-#Step 2. Process and categorize reviews
-#Step 3. Handle multi-places
-#Step 4. Save results on CSV
-#Step 5. Make a web interface
-
-
 import requests
 import os
 from transformers import pipeline
@@ -47,7 +40,7 @@ def geocode_address(address, api_key):
     else:
         raise ValueError(f'Geocoding failed with status: {data["status"]}')
 
-def fetch_reviews(place_id, api_key, max_reviews=5):
+def fetch_reviews(place_id, api_key, max_reviews=10):
     """Fetches reviews for a given place ID from Google Maps API.
 
     Args:
@@ -91,8 +84,11 @@ def classify_review(review_text):
 def index():
     if request.method == 'POST':
         category = request.form['category']
+        # Get user preferences from the form
+        selected_preferences = request.form.getlist('preferences')  # List of selected categories
+        
         try:
-            # Determine location
+            # Determine location (unchanged)
             if 'lat' in request.form and 'lng' in request.form and request.form['lat'] and request.form['lng']:
                 lat = float(request.form['lat'])
                 lng = float(request.form['lng'])
@@ -102,21 +98,27 @@ def index():
                     return render_template('results.html', error='No location provided.')
                 lat, lng = geocode_address(location_text, API_KEY)
                 
-            # Perform a nearby search
-            radius = 1500  # 1.5 km
+            # Perform a nearby search (unchanged)
+            radius = 1000  # 1 km
             url = f'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={lat},{lng}&radius={radius}&type={category}&key={API_KEY}'
             response = requests.get(url)
             data = response.json()
             if data['status'] != 'OK':
                 return render_template('results.html', error='No places found.')
-            places = data['results'][:3]  # Take first 3 places
+            places = data['results'][:10]  # Take first 10 places
+            
+            # Compute user weights
+            if selected_preferences:
+                num_selected = len(selected_preferences)
+                user_weights = {cat: 1.0 / num_selected if cat in selected_preferences else 0 for cat in CATEGORIES}
+            else:
+                user_weights = None  # No preferences selected
             
             # Process each place
             place_data = []
             for place in places:
                 place_id = place['place_id']
                 name = place['name']
-                # Extract latitude and longitude
                 lat = place['geometry']['location']['lat']
                 lng = place['geometry']['location']['lng']
                 reviews = fetch_reviews(place_id, API_KEY)
@@ -139,8 +141,6 @@ def index():
                             category = 'N/A'
                     else:
                         category = 'N/A'
-                    
-                    # Store all reviews for display            
                     classify_reviews.append({
                         'text': review['text'],
                         'rating': rating,
@@ -148,26 +148,45 @@ def index():
                     })
                 # Calculate average rating
                 overall_avg = sum(overall_ratings) / len(overall_ratings) if overall_ratings else None
-
-                # Best category
+                
+                # Best category (unchanged)
                 most_common_category = category_counts.most_common(1)[0][0] if category_counts else 'N/A'
-                # Add place data including lat and lng
+                
+                # Compute place proportions
+                total_high_rated = sum(category_counts.values())
+                if total_high_rated > 0:
+                    place_proportions = {cat: category_counts[cat] / total_high_rated for cat in CATEGORIES}
+                else:
+                    place_proportions = {cat: 0 for cat in CATEGORIES}  # No high-rated reviews
+                
+                # Compute personalized score
+                if user_weights:
+                    score = sum(user_weights[cat] * place_proportions[cat] for cat in CATEGORIES)
+                else:
+                    score = overall_avg if overall_avg is not None else 0  # Fallback to overall rating
+                
+                # Store place data with score
                 place_data.append({
                     'name': name,
-                    'lat': lat,  # New: latitude
-                    'lng': lng,  # New: longitude
+                    'lat': lat,
+                    'lng': lng,
                     'overall_avg': overall_avg,
                     'category': most_common_category,
-                    'reviews': classify_reviews
+                    'reviews': classify_reviews,
+                    'score': score  # New field for sorting
                 })
+            
+            # Sort places by score (descending)
+            place_data.sort(key=lambda x: x['score'], reverse=True)
+            
             return render_template('results.html', places=place_data, api_key=API_KEY)           
         except ValueError as e:
             return render_template('results.html', error=str(e))
         except Exception as e:
             return render_template('results.html', error=f"An error occurred: {str(e)}")
         
-    # GET requests
-    return render_template('index.html', api_key = API_KEY)
+    # GET requests (unchanged)
+    return render_template('index.html', api_key=API_KEY)
 
 #Run app
 if __name__ == '__main__':

@@ -11,6 +11,10 @@
         <i class="fas fa-moon"></i>
     </button>
     <div class="container">
+        <!-- Logo Section -->
+        <div class="logo">
+            <h1>PlaceFinder</h1>
+        </div>
         <h1>Places Found</h1>
         {% if error %}
             <p class="error">{{ error }}</p>
@@ -20,6 +24,8 @@
                     <h2>{{ place['name'] }}</h2>
                     <p>Overall Average Rating: {{ place['overall_avg']|round(1) if place['overall_avg'] else 'N/A' }}</p>
                     <p>Most Common Category: {{ place['category'] }}</p>
+                    <!-- Optional Match Score (uncomment if backend provides 'score') -->
+                    <!-- <p>Match Score: {{ (place['score'] * 100)|round(0) }}%</p> -->
                     <div id="map-{{ loop.index }}" class="map">
                         <iframe
                             width="100%"
@@ -28,7 +34,7 @@
                             loading="lazy"
                             allowfullscreen
                             referrerpolicy="no-referrer-when-downgrade"
-                            src="https://www.google.com/maps/embed/v1/place?key={{ api_key }}&q={{ place['name']|urlencode }},{{ place['lat'] }},{{ place['lng'] }}&zoom=15"
+                            src="https://www.google.com/maps/embed/v1/view?key={{ api_key }}&center={{ place['lat'] }},{{ place['lng'] }}&zoom=15"
                             onerror="this.innerHTML='<p>Map loading failed. Please try again later.</p>'"
                         ></iframe>
                     </div>
