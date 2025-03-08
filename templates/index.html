@@ -5,33 +5,65 @@
     <title>Review Analyzer</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        // Immediately apply saved theme before page render
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+        function toggleTheme() {
+            const root = document.documentElement;
+            const icon = document.querySelector('.theme-toggle i');
+            if (root.getAttribute('data-theme') === 'dark') {
+                root.removeAttribute('data-theme');
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'light');
+            } else {
+                root.setAttribute('data-theme', 'dark');
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+    </script>
 </head>
 <body>
+    <!-- Theme Toggle Button (small circular button at top right) -->
+    <button class="theme-toggle" onclick="toggleTheme()">
+        <i class="fas fa-moon"></i>
+    </button>
     <div class="hero">
         <div class="container">
             <h1>Find Nearby Places</h1>
             <form method="POST" action="/">
                 <!-- Location Input -->
                 <div class="form-group">
-                    <label for="location">Location:</label>
+                    <label class="form-title" for="location">Location:</label>
                     <input type="text" id="location" name="location_text" placeholder="Enter address or leave blank for current location">
                 </div>
                 <div class="form-group">
-                    <input type="checkbox" id="use_current" name="use_current"> Use current location
+                    <input type="checkbox" id="use_current" name="use_current"> 
+                    <label for="use_current" class="form-title">Use current location</label>
                 </div>
 
-                <!-- Category Selection (Horizontal Buttons) -->
-                <div class="category-selection">
-                    <input type="radio" id="cafe" name="category" value="cafe">
-                    <label for="cafe">Cafe</label>
-                    <input type="radio" id="bar" name="category" value="bar">
-                    <label for="bar">Bar</label>
+                <!-- Category Selection with Title -->
+                <div class="form-group">
+                    <p class="form-title">What are you looking for?</p>
+                    <div class="category-selection">
+                        <input type="radio" id="cafe" name="category" value="cafe">
+                        <label for="cafe">Cafe</label>
+                        <input type="radio" id="bar" name="category" value="bar">
+                        <label for="bar">Bar</label>
+                    </div>
                 </div>
 
-                <!-- Preferences (Horizontal Buttons) -->
-                <div class="preferences">
-                    <p class="preferences-label">What do you value most? (Select all that apply)</p>
-                    <div class="preferences-buttons">
+                <!-- Preferences -->
+                <div class="form-group">
+                    <p class="form-title">What do you value most?</p>
+                    <div class="category-selection">
                         <input type="checkbox" id="service" name="preferences" value="service quality">
                         <label for="service">Service Quality</label>
                         <input type="checkbox" id="value" name="preferences" value="value for money">
@@ -40,6 +72,19 @@
                         <label for="food">Food Quality</label>
                         <input type="checkbox" id="ambiance" name="preferences" value="ambiance">
                         <label for="ambiance">Ambiance</label>
+                    </div>
+                </div>
+
+                <!-- Number of Places -->
+                <div class="form-group">
+                    <label class="form-title" for="max_places">Number of places to display:</label>
+                    <div class="category-selection">
+                        <input type="radio" id="places5" name="max_places" value="5" checked>
+                        <label for="places5">5</label>
+                        <input type="radio" id="places10" name="max_places" value="10">
+                        <label for="places10">10</label>
+                        <input type="radio" id="places15" name="max_places" value="15">
+                        <label for="places15">15</label>
                     </div>
                 </div>
 
@@ -103,28 +148,21 @@
             }
         });
 
-        function toggleTheme() {
-            const body = document.body;
-            const icon = document.querySelector('.theme-toggle i');
-            
-            if (body.getAttribute('data-theme') === 'dark') {
-                body.removeAttribute('data-theme');
-                icon.classList.remove('fa-sun');
-                icon.classList.add('fa-moon');
-                localStorage.setItem('theme', 'light');
-            } else {
-                body.setAttribute('data-theme', 'dark');
-                icon.classList.remove('fa-moon');
-                icon.classList.add('fa-sun');
-                localStorage.setItem('theme', 'dark');
-            }
-        }
-
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme === 'dark') {
-            document.body.setAttribute('data-theme', 'dark');
+            document.documentElement.setAttribute('data-theme', 'dark');
             document.querySelector('.theme-toggle i').classList.replace('fa-moon', 'fa-sun');
         }
+
+        // Apply saved theme on load
+        document.addEventListener("DOMContentLoaded", function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                const icon = document.querySelector('.theme-toggle i');
+                if (icon) icon.classList.replace('fa-moon', 'fa-sun');
+            }
+        });
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key={{api_key}}&callback=initMap" async defer></script>
 </body>

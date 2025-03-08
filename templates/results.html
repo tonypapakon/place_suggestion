@@ -5,13 +5,38 @@
     <title>Results</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const icon = document.querySelector('.theme-toggle i');
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.removeAttribute('data-theme');
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+        document.addEventListener("DOMContentLoaded", function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                const icon = document.querySelector('.theme-toggle i');
+                if (icon) icon.classList.replace('fa-moon', 'fa-sun');
+            }
+        });
+    </script>
 </head>
 <body>
+    <!-- Theme Toggle Button -->
     <button class="theme-toggle" onclick="toggleTheme()">
         <i class="fas fa-moon"></i>
     </button>
     <div class="container">
-        <!-- Logo Section -->
         <div class="logo">
             <h1>PlaceFinder</h1>
         </div>
@@ -24,8 +49,11 @@
                     <h2>{{ place['name'] }}</h2>
                     <p>Overall Average Rating: {{ place['overall_avg']|round(1) if place['overall_avg'] else 'N/A' }}</p>
                     <p>Most Common Category: {{ place['category'] }}</p>
-                    <!-- Optional Match Score (uncomment if backend provides 'score') -->
-                    <!-- <p>Match Score: {{ (place['score'] * 100)|round(0) }}%</p> -->
+                    <form action="/rate" method="POST">
+                        <input type="hidden" name="place_id" value="{{ place.place_id }}">
+                        <input type="hidden" name="category" value="{{ place.category }}">
+                        <button type="submit">Like</button>
+                    </form>
                     <div id="map-{{ loop.index }}" class="map">
                         <iframe
                             width="100%"
@@ -53,31 +81,5 @@
         {% endif %}
         <a href="/">Back to Home</a>
     </div>
-    <script>
-        // Theme toggle functionality
-        function toggleTheme() {
-            const body = document.body;
-            const icon = document.querySelector('.theme-toggle i');
-            
-            if (body.getAttribute('data-theme') === 'dark') {
-                body.removeAttribute('data-theme');
-                icon.classList.remove('fa-sun');
-                icon.classList.add('fa-moon');
-                localStorage.setItem('theme', 'light');
-            } else {
-                body.setAttribute('data-theme', 'dark');
-                icon.classList.remove('fa-moon');
-                icon.classList.add('fa-sun');
-                localStorage.setItem('theme', 'dark');
-            }
-        }
-
-        // Check for saved theme preference
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.body.setAttribute('data-theme', 'dark');
-            document.querySelector('.theme-toggle i').classList.replace('fa-moon', 'fa-sun');
-        }
-    </script>
 </body>
 </html>
