@@ -37,7 +37,11 @@
     </button>
     <div class="hero">
         <div class="container">
-            <h1>Find Nearby Places</h1>
+            <!-- Logo and App Name -->
+            <div class="header">
+                <img src="{{ url_for('static', filename='logo_place_suggestion.png') }}" alt="Logo" style="height:50px; margin-right:10px;">
+                <h1>Find Nearby Places</h1>
+            </div>
             <form method="POST" action="/">
                 <!-- Location Input -->
                 <div class="form-group">

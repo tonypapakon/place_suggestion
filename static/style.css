@@ -218,3 +218,10 @@ button:hover {
 .preferences-buttons {
     margin-bottom: 30px;
 }
+
+/* Header Styling */
+.header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
