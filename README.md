@@ -103,6 +103,16 @@ place_suggestion/
 └── README.md           # Project documentation
 ```
 
+## Screenshots
+
+### Light Mode
+
+![Light Mode](screenshots/light_mode.png)
+
+### Dark Mode
+
+![Dark Mode](screenshots/dark_mode.png)
+
 ## Contributing
 
 1. Fork the repository
