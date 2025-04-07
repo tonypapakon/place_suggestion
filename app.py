@@ -28,26 +28,35 @@ classifier = pipeline(model="facebook/bart-large-mnli")
 # --- Database Setup ---
 
 def get_db_connection():
-    """Connect to the SQLite database."""
-    conn = sqlite3.connect('feedback.db')
-    conn.row_factory = sqlite3.Row  # Allows accessing columns by name
-    return conn
+    """Connect to the SQLite database using a context manager."""
+    try:
+        conn = sqlite3.connect('feedback.db')
+        conn.row_factory = sqlite3.Row  # Allows accessing columns by name
+        return conn
+    except sqlite3.Error as e:
+        raise Exception(f"Database connection error: {e}")
 
 def init_db():
-    """Initialize the database with the user_feedback table."""
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS user_feedback (
-            user_id TEXT,
-            place_id TEXT,
-            liked BOOLEAN,
-            category TEXT,
-            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    conn.commit()
-    conn.close()
+    """Initialize the database with the user_feedback table and indices."""
+    try:
+        with get_db_connection() as conn:  # Use connection as a context manager
+            cursor = conn.cursor()
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS user_feedback (
+                    user_id TEXT,
+                    place_id TEXT,
+                    liked BOOLEAN,
+                    category TEXT,
+                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            # Add indices for performance on user_id, place_id, and category.
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_user_id ON user_feedback(user_id)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_place_id ON user_feedback(place_id)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_category ON user_feedback(category)')
+            conn.commit()
+    except sqlite3.Error as e:
+        print(f"SQLite error during init_db: {e}")
 
 # Run database initialization when the app starts
 init_db()
@@ -236,13 +245,17 @@ def rate_place():
     place_id = request.form.get('place_id')
     category = request.form.get('category')
     user_id = session.get('user_id', 'default_user')  # Temporary user ID
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute('INSERT INTO user_feedback (user_id, place_id, liked, category) VALUES (?, ?, ?, ?)',
-                   (user_id, place_id, True, category))
-    conn.commit()
-    conn.close()
-    return render_template('results.html', places=[], api_key=API_KEY, error="Feedback recorded!")
+    try:
+        with get_db_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                INSERT INTO user_feedback (user_id, place_id, liked, category)
+                VALUES (?, ?, ?, ?)
+            ''', (user_id, place_id, True, category))
+            conn.commit()
+        return render_template('results.html', places=[], api_key=API_KEY, error="Feedback recorded!")
+    except sqlite3.Error as e:
+        return render_template('results.html', error="Database error: " + str(e))
 
 # Run app
 if __name__ == '__main__':

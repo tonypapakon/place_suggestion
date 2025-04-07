@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Results</title>
+    <title>Place Suggestion</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo_place_suggestion.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script>
@@ -40,14 +41,14 @@
         <!-- Logo and App Name in Header Bar -->
         <div class="header">
             <img src="{{ url_for('static', filename='logo_place_suggestion.png') }}" alt="Logo" style="height:50px; margin-right:10px;">
-            <h1>PlaceFinder</h1>
+            <h1>Place Suggestion</h1>
         </div>
-        <h1>Places Found</h1>
+        <h2></h2>
         {% if error %}
             <p class="error">{{ error }}</p>
         {% else %}
             {% for place in places %}
-                <div class="place">
+                <div class="place" style="width: 800px;">
                     <h2>{{ place['name'] }}</h2>
                     <p>Overall Average Rating: {{ place['overall_avg']|round(1) if place['overall_avg'] else 'N/A' }}</p>
                     <p>Most Common Category: {{ place['category'] }}</p>
@@ -69,15 +70,19 @@
                         ></iframe>
                     </div>
                     <h3>Reviews:</h3>
-                    <ul>
-                        {% for review in place['reviews'] %}
-                            <li class="review">
-                                <p><strong>Text:</strong> {{ review['text'] }}</p>
-                                <p><strong>Rating:</strong> {{ review['rating'] }}</p>
-                                <p><strong>Category:</strong> {{ review['category'] }}</p>
-                            </li>
-                        {% endfor %}
-                    </ul>
+                    <div class="reviews">
+                        {% if place['reviews']|length > 0 %}
+                            {% for review in place['reviews'] %}
+                                <div class="review">
+                                    <p><strong>Text:</strong> {{ review['text'] }}</p>
+                                    <p><strong>Rating:</strong> {{ review['rating'] }}</p>
+                                    <p><strong>Category:</strong> {{ review['category'] }}</p>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="no-reviews">No reviews available</div>
+                        {% endif %}
+                    </div>
                 </div>
             {% endfor %}
         {% endif %}

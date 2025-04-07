@@ -225,3 +225,11 @@ button:hover {
     align-items: center;
     margin-bottom: 20px;
 }
+
+/* Hero Section */
+.hero {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
