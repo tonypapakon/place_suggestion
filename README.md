@@ -107,11 +107,11 @@ place_suggestion/
 
 ### Light Mode
 
-![Light Mode](screenshots/light_mode.png)
+![Light Mode](screenshots/UI_light.png)
 
 ### Dark Mode
 
-![Dark Mode](screenshots/dark_mode.png)
+![Dark Mode](screenshots/UI_dark.png)
 
 ## Contributing
 
