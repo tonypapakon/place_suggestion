@@ -4,3 +4,4 @@ python-dotenv
 flask
 torch
 tqdm
+scikit-learn

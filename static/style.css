@@ -1,155 +1,227 @@
+:root {
+    --primary-color: #0a84ff;
+    --secondary-color: #409cff;
+    --text-color: #333;
+    --background-color: #fff;
+    --border-color: #ccc;
+}
+
+[data-theme="dark"] {
+    --primary-color: #409cff;
+    --secondary-color: #0a84ff;
+    --text-color: #eee;
+    --background-color: #222;
+    --border-color: #555;
+}
+
 /* General Styles */
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    color: #333;
+    color: var(--text-color);
     margin: 0;
     padding: 0;
-    background: white;
+    background: var(--background-color);
+    transition: background 0.3s, color 0.3s;
 }
 
-.hero {
-    background: linear-gradient(135deg, #e0eafc, #cfdef3); /* Subtle gradient for modern depth */
-    min-height: 100vh;
+/* Theme Toggle Button */
+.theme-toggle {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: none;
+    outline: none;
+    cursor: pointer;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: background-color 0.3s;
 }
 
+.theme-toggle i {
+    font-size: 16px;
+    color: var(--text-color);
+}
+
+/* Container Styles */
 .container {
     background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px); /* Modern blur effect */
-    -webkit-backdrop-filter: blur(10px); /* Safari support */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-radius: 10px;
     padding: 40px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    max-width: 600px;
+    max-width: 800px;
     width: 100%;
-    animation: fadeIn 0.5s ease-in;
-}
-
-
-h1 {
-    font-size: 36px;
-    color: #333;
+    margin: 0 auto;
     text-align: center;
-    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeIn 0.5s ease-in;
+    border: 1px solid var(--border-color);
 }
 
 /* Form Styling */
 .form-group {
-    margin-bottom: 30px; /* Consistent spacing between form sections */
+    margin-bottom: 30px;
 }
 
 .form-group label {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
+    color: var(--text-color);
 }
 
 .form-group input[type="text"] {
     width: 100%;
     padding: 10px 0;
     border: none;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--border-color);
     font-size: 16px;
     background: transparent;
+    color: var(--text-color);
 }
 
 .form-group input[type="text"]:focus {
     outline: none;
-    border-bottom: 1px solid #007AFF; /* Apple blue */
+    border-bottom: 1px solid var(--primary-color);
 }
 
-.form-group input[type="checkbox"] {
-    margin-right: 10px;
+/* New Form Title Styling */
+.form-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: var(--text-color);
 }
 
 /* Category Selection */
 .category-selection {
     display: flex;
     justify-content: center;
-    gap: 20px; /* Space between category buttons */
+    gap: 20px;
 }
 
 .category-selection input {
-    display: none; /* Hide radio inputs */
+    display: none;
 }
 
 .category-selection label {
-    padding: 12px 24px; /* Larger padding for prominence */
-    background-color: #f0f0f0;
+    padding: 12px 24px;
+    background-color: rgba(255, 255, 255, 0.1);
     border-radius: 20px;
     cursor: pointer;
-    transition: background-color 0.3s, color 0.3s, transform 0.3s;
-    text-align: center; /* Center text within buttons */
+    transition: all 0.3s;
+    color: var(--text-color);
 }
 
 .category-selection input:checked + label {
-    background-color: #007AFF;
+    background-color: var(--primary-color);
     color: white;
-}
-
-.category-selection label:hover {
-    transform: scale(1.05); /* Slight zoom on hover */
 }
 
 /* Preferences */
 .preferences-label {
     font-size: 18px;
     font-weight: 600;
-    margin-bottom: 15px; /* Space below the label */
+    margin-bottom: 15px;
     text-align: center;
+    color: var(--text-color);
 }
 
 .preferences-buttons {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* Two-column grid for preferences */
-    gap: 15px; /* Space between preference buttons */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
 }
 
 .preferences input {
-    display: none; /* Hide checkboxes */
+    display: none;
 }
 
 .preferences label {
     padding: 10px;
-    background-color: #f0f0f0;
+    background-color: rgba(255, 255, 255, 0.1);
     border-radius: 20px;
     cursor: pointer;
-    text-align: center; /* Center text within buttons */
-    transition: background-color 0.3s, color 0.3s, transform 0.3s;
+    transition: all 0.3s;
+    color: var(--text-color);
 }
 
 .preferences input:checked + label {
-    background-color: #007AFF;
+    background-color: var(--primary-color);
     color: white;
-}
-
-.preferences label:hover {
-    transform: scale(1.05); /* Slight zoom on hover */
 }
 
 /* Submit Button */
 button {
     width: 100%;
     padding: 12px;
-    background-color: #007AFF; /* Apple blue */
+    background-color: var(--primary-color);
     color: white;
     border: none;
     border-radius: 5px;
     font-size: 16px;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
+    transition: all 0.3s;
     transform: scale(1);
 }
 
 button:hover {
-    background-color: #005ECB; /* Darker blue on hover */
-    transform: scale(1.02); /* Slight zoom on hover */
+    background-color: var(--secondary-color);
+    transform: scale(1.02);
 }
 
 /* Fade-In Animation */
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
+}
+
+/* Results Page Styling */
+.place {
+    margin-bottom: 40px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
+}
+
+.review {
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+    text-align: left; /* Align review text to the left */
+}
+
+.map iframe {
+    border-radius: 10px;
+    width: 100%;
+    height: 300px;
+}
+
+/* Ensure consistent spacing for form sections */
+.form-group,
+.category-selection,
+.preferences,
+.preferences-label,
+.preferences-buttons {
+    margin-bottom: 30px;
+}
+
+/* Header Styling */
+.header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
 }
