@@ -1,6 +1,8 @@
-# Place Suggestion
-
-![Logo](static/logo_place_suggestion.png)
+<h1 align="center">
+  <img src="static/logo_place_suggestion.png" alt="Logo" width="150" style="margin-bottom:20px;">
+  <br>
+  Place Suggestion
+</h1>
 
 Place Suggestion is a web application that helps users find and analyze nearby cafes and bars. Using the Google Maps API and natural language processing techniques, the app categorizes reviews and provides personalized recommendations based on user preferences.
 
@@ -97,8 +99,8 @@ place_suggestion/
 │   ├── style.css      # CSS styles
 │   └── logo_place_suggestion.png  # Application logo for visual branding
 ├── requirements.txt    # Python dependencies
-├── .env               # Environment variables
-└── README.md          # Project documentation
+├── .env                # Environment variables
+└── README.md           # Project documentation
 ```
 
 ## Contributing
