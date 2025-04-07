@@ -65,10 +65,6 @@ Before running this application, you need:
    G_API_KEY=your_google_maps_api_key_here
    ```
 
-5. **Add your logo:**
-   - Save your logo image (with dimensions 447x447, e.g. `logo_place_suggestion.png`) in the `static` folder.
-   - The logo appears in the header of both the home and results pages.
-
 ## Usage
 
 1. **Start the Flask application:**
