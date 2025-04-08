@@ -9,7 +9,6 @@ Place Suggestion is a web application that helps users find and analyze nearby c
 ## Features
 
 - **Search for Nearby Cafes and Bars:** Use your current location or enter a specific address.
-- **Visual Branding:** Updated with a custom logo displayed on the home screen and header bar.
 - **Detailed Place Information:**
   - Location displayed on an interactive map.
   - Average rating from reviews.
